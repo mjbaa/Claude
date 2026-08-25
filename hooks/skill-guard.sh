@@ -3,7 +3,7 @@ INPUT=$(cat)
 
 SUB=$(printf '%s' "$INPUT" | sed -n 's/.*"subagent_type"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
 case "$SUB" in
-  tracer|historian|explorer|critic|side-effect|scope-auditor|verifier) ;;
+  tracer|historian|explorer|critic|side-effect|scope-auditor|verifier|conventions) ;;
   *) exit 0 ;;
 esac
 
