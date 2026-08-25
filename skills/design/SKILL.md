@@ -8,6 +8,10 @@ description: 분석 결과를 바탕으로 변경 설계를 확정한다. 접근
 
 ## 0. 입력 확인
 
+{ID}가 가리키는 디렉토리를 먼저 확정한다 — 티켓이 상위 티켓 디렉토리 안에 중첩될 수 있다:
+`find docs/wf -maxdepth 3 -type d -name "*{ID}*"`
+이후 모든 `docs/wf/{ID}/` 표기는 확정된 그 디렉토리를 뜻한다.
+
 `docs/wf/{ID}/analysis.md` 를 읽는다.
 없으면 중단하고 analyze-incident 또는 analyze-spec을 먼저 실행하라고 안내한다.
 

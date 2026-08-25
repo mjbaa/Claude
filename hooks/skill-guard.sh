@@ -8,7 +8,7 @@ case "$SUB" in
 esac
 
 ROOT="${CLAUDE_PROJECT_DIR:-$PWD}"
-STAGE=$(ls -t "$ROOT"/docs/wf/*/stage/stage.json 2>/dev/null | head -1)
+STAGE=$(find "$ROOT/docs/wf" -type f -path "*/stage/stage.json" -print -quit 2>/dev/null)
 [ -n "$STAGE" ] && exit 0
 
 mkdir -p "$ROOT/docs/wf"

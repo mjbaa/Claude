@@ -8,6 +8,10 @@ design.md를 계약으로 삼아 구현하고, 이어서 검증한다.
 
 ## 0. 입력 확인
 
+{ID}가 가리키는 디렉토리를 먼저 확정한다 — 티켓이 상위 티켓 디렉토리 안에 중첩될 수 있다:
+`find docs/wf -maxdepth 3 -type d -name "*{ID}*"`
+이후 모든 `docs/wf/{ID}/` 표기는 확정된 그 디렉토리를 뜻한다.
+
 `docs/wf/{ID}/design.md` 를 읽는다.
 없으면 중단하고 design을 먼저 실행하라고 안내한다.
 

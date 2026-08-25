@@ -1,6 +1,25 @@
 #!/bin/bash
 ROOT="${CLAUDE_PROJECT_DIR:-$PWD}"
-STAGE=$(ls -t "$ROOT"/docs/wf/*/stage/stage.json 2>/dev/null | head -1)
+
+FILE=$(cat | sed -n 's/.*"file_path"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
+[ -z "$FILE" ] && exit 0
+
+case "$FILE" in */stage/stage.json) exit 0 ;; esac
+
+# 활성 stage 탐색 — 중첩 티켓 지원 (docs/wf 하위 깊이 무관)
+# 편집 파일이 docs/wf 하위면, 그 파일에서 가장 가까운 상위 티켓의 stage 를 우선 사용한다
+STAGE=""
+ABS="$FILE"; case "$ABS" in /*) ;; *) ABS="$ROOT/$ABS" ;; esac
+case "$ABS" in
+  "$ROOT"/docs/wf/*)
+    DIR=$(dirname "$ABS")
+    while [ "$DIR" != "$ROOT/docs/wf" ] && [ "$DIR" != "/" ]; do
+      if [ -f "$DIR/stage/stage.json" ]; then STAGE="$DIR/stage/stage.json"; break; fi
+      DIR=$(dirname "$DIR")
+    done
+    ;;
+esac
+[ -n "$STAGE" ] || STAGE=$(find "$ROOT/docs/wf" -type f -path "*/stage/stage.json" -exec ls -t {} + 2>/dev/null | head -1)
 [ -n "$STAGE" ] && [ -f "$STAGE" ] || exit 0
 
 ALLOWED=$(sed -n '/"allow"/,/]/p' "$STAGE" | grep -o '"[^"]*\.[a-zA-Z]*"' | tr -d '"')
@@ -10,11 +29,6 @@ if [ -n "$(find "$STAGE" -mmin +240 2>/dev/null)" ]; then
   echo "경고: stage.json이 4시간 이상 오래되어 무시합니다. 필요하면 삭제하십시오: $STAGE" >&2
   exit 0
 fi
-
-FILE=$(cat | sed -n 's/.*"file_path"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
-[ -z "$FILE" ] && exit 0
-
-case "$FILE" in */stage/stage.json) exit 0 ;; esac
 
 while IFS= read -r a; do
   [ -z "$a" ] && continue
